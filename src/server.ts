@@ -56,33 +56,25 @@ app.post("/signatures", (req, res) => {
     });
   }
 });
-
-app.put("/signatures:epoch", (req, res) => {
+//
+//
+//
+app.put("/signatures/:epoch", (req, res) => {
   const epochId = parseInt(req.params.epoch); // params are string type
-  const signature = findSignatureByEpoch(epochId);
-  const { name, message } = req.body;
-  if (signature && typeof name === "string") {
-    const updatedSignature = updateSignature({
-      name: name,
-      // only include message if it is a string
-      message: typeof message === "string" ? message : undefined,
-    }, {
-      name: name,
-      // only include message if it is a string
-      message: typeof message === "string" ? message : undefined,
-    });
-
-    res.status(201).json({
+  const updateThisSignature = req.body;
+  const update = updateSignatureByEpoch(epochId, updateThisSignature) ;
+  if (update) {
+    res.status(200).json({
       status: "success",
       data: {
-        signature: updatedSignature,
+        signature: update,
       },
     });
   } else {
-    res.status(400).json({
+    res.status(404).json({
       status: "fail",
       data: {
-        name: "A string value for name is required in your JSON body",
+        epochId: "Could not find name",
       },
     });
   }
