@@ -4,7 +4,10 @@ import {
   findSignatureByEpoch,
   getAllSignatures,
   insertSignature,
+  updateSignature,
   removeSignatureByEpoch,
+  updateSignatureByEpoch,
+  findIndexOfSignature
 } from "./signature/model";
 
 const app = express();
@@ -54,6 +57,39 @@ app.post("/signatures", (req, res) => {
   }
 });
 
+app.put("/signatures:epoch", (req, res) => {
+  const epochId = parseInt(req.params.epoch); // params are string type
+  const signature = findSignatureByEpoch(epochId);
+  const { name, message } = req.body;
+  if (signature && typeof name === "string") {
+    const updatedSignature = updateSignature({
+      name: name,
+      // only include message if it is a string
+      message: typeof message === "string" ? message : undefined,
+    }, {
+      name: name,
+      // only include message if it is a string
+      message: typeof message === "string" ? message : undefined,
+    });
+
+    res.status(201).json({
+      status: "success",
+      data: {
+        signature: updatedSignature,
+      },
+    });
+  } else {
+    res.status(400).json({
+      status: "fail",
+      data: {
+        name: "A string value for name is required in your JSON body",
+      },
+    });
+  }
+});
+//////
+/////
+/////
 app.get("/signatures/:epoch", (req, res) => {
   // :epoch is a route parameter
   //  see documentation: https://expressjs.com/en/guide/routing.html
